@@ -6,3 +6,4 @@ sqlfluff/
 .github/copilot-instructions.md
 
 .codacyrc
+.sqlfluff

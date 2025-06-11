@@ -1,2 +1,0 @@
-[tool.sqlfluff.core]
-dialect = "postgres"

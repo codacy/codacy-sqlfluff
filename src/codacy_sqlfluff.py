@@ -67,7 +67,8 @@ def readJsonFile(path):
 
 
 def run_sqlfluff(patterns, files, cwd=None):
-
+    # we should always run sqlfluff with --dialect flag and postgres is the default.
+    # if you want to run it with another dialect, you can use the configuration file
     if len(patterns):
         cmd = ["sqlfluff", "lint", "--format", "json", "--dialect", "postgres", "--rules"]
         cmd = cmd + [",".join(patterns)]  + files

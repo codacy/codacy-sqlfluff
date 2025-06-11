@@ -4,6 +4,10 @@ This is the docker engine we use at Codacy to have [SQLFluff](https://docs.sqlfl
 You can also create a docker to integrate the tool and language of your choice!
 See the [codacy-engine-scala-seed](https://github.com/codacy/codacy-engine-scala-seed) repository for more information.
 
+## Python compatibility
+Compatible with Python 3.13
+
+
 ## Dialects compatibility
 -  ansi
 -  athena
@@ -31,6 +35,35 @@ See the [codacy-engine-scala-seed](https://github.com/codacy/codacy-engine-scala
 -  trino
 -  tsql
 -  vertica
+
+## Configuration files supported (it follows the same order)
+-  setup.cfg
+-  tox.ini
+-  pep8.ini
+-  .sqlfluff
+-  pyproject.toml
+
+## Note
+By default we're running SQLFluff with the dialect postgres because the flag is mandatory.
+If your codebase is based on another dialect above, please create a simple .sqlfluff config file
+in the root of your repository with the following content (let's use oracle as example):
+
+```text
+[sqlfluff]
+dialect = oracle
+```
+It will run for all existing rules for the dialect oracle
+
+If you want to ignore some of the rules, please use the same configuration file:
+
+```text
+[sqlfluff]
+dialect = postgres
+exclude_rules = LT01,RF01
+```
+
+It will run for all existing rules, excluding LT01 and RF01, for the dialect oracle
+
 
 ## Usage
 
