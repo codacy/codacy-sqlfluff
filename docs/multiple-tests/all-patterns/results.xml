@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <checkstyle version="4.3">
-  <!-- This test is specifically made to test that codacy-ruff -->
-  <!-- should only return specific errors to test and/or empty files. -->
-  <!-- Adding any other errors here means to test that a bug exists. -->
   <file name="test.sql">
     <error source="LT01_layout.spacing" line="1" message="Expected only single space before binary operator '+'. Found '  '. (LT01)" severity="info" />
     <error source="LT01_layout.spacing" line="1" message="Expected only single space before naked identifier. Found '  '. (LT01)" severity="info" />
