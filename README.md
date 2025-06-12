@@ -43,16 +43,16 @@ Compatible with Python 3.13
 -  .sqlfluff
 -  pyproject.toml
 
-## Note
-By default we're running SQLFluff with the dialect postgres because the flag is mandatory.
-If your codebase is based on another dialect above, please create a simple .sqlfluff config file
-in the root of your repository with the following content (let's use oracle as example):
+### Note: If you have multiple configuration files in your repository, they will be taken into consideration for the analysis of each file where the tool finds the configuration files
+
+## How to run SQLFluff for the dialect of my codebase
+By default, we run SQLFluff with the dialect Postgres because the flag --dialect is mandatory. If your codebase is based on another dialect above, please create a simple **.sqlfluff** config file in the root of your repository with the following content (let's use Oracle as an example):
 
 ```text
 [sqlfluff]
 dialect = oracle
 ```
-It will run for all existing rules for the dialect oracle
+It will run for all existing rules for the dialect Oracle
 
 If you want to ignore some of the rules, please use the same configuration file:
 
@@ -62,7 +62,7 @@ dialect = postgres
 exclude_rules = LT01,RF01
 ```
 
-It will run for all existing rules, excluding LT01 and RF01, for the dialect oracle
+It will run for all existing rules, excluding LT01 and RF01, for the dialect Oracle
 
 
 ## Usage
