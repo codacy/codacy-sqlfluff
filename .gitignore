@@ -1,0 +1,9 @@
+#Ignore all downloaded rules from sqlfluff repository
+src/sqlfluff/
+sqlfluff/
+
+#Ignore vscode AI rules
+.github/copilot-instructions.md
+
+.codacyrc
+.sqlfluff
