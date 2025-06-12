@@ -1,6 +1,6 @@
 {
   "name": "sqlfluff",
-  "version": "3.4.0",
+  "version": "An error occurred: 'list' object has no attribute 'strip'",
   "patterns": [
     {
       "patternId": "JJ01_jinja.padding",

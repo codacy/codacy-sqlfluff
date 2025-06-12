@@ -1,1 +1,1 @@
-SELECT a  +  b FROM tbl;
+SELECT a  +  b FROM db.testTable;

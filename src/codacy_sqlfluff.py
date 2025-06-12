@@ -7,9 +7,6 @@ import glob
 import signal
 from contextlib import contextmanager
 import traceback
-from pathlib import Path
-import toml
-import fnmatch
 
 
 @contextmanager
@@ -140,7 +137,8 @@ def readConfiguration(configFile, srcDir):
         tools = [t for t in configuration["tools"] if t["name"] == "sqlfluff"]
         if tools and "patterns" in tools[0]:
             sqlfluff = tools[0]
-            patterns = [p["patternId"].split("_")[0] for p in sqlfluff.get("patterns") or []] ## all patterns have a code and only that code is needed to run --rules flag
+            ## all patterns have a code and only that code is needed to run --rules flag
+            patterns = [p["patternId"].split("_")[0] for p in sqlfluff.get("patterns") or []]
         else:
             patterns = []
 
@@ -163,17 +161,16 @@ def run_tool(configFile, srcDir):
     
     return res
 
-
 def results_to_json(results):
     return os.linesep.join([toJson(res) for res in results])
-
 
 if __name__ == "__main__":
     with timeout(getTimeout(os.environ.get("TIMEOUT_SECONDS") or "")):
         try:
-            results = run_tool("/.codacyrc", "/src")     
+            results = run_tool("/.codacyrc", "/src")
             results = results_to_json(results)
             print(results)
         except Exception:
             traceback.print_exc()
             sys.exit(1)
+
