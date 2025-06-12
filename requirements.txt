@@ -1,6 +1,2 @@
 sqlfluff==3.4.0
 jsonpickle==4.1.1
-numpy==2.3.0
-pytest==8.4.0
-toml==0.10.2
-

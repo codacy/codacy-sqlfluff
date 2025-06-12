@@ -2,9 +2,7 @@ import os
 import ast
 import requests
 import json
-import re
 
-# Mapping rule acronyms to severity levels
 severity_mapping = {
     "AL": "Warning",
     "AM": "Error",
@@ -48,7 +46,7 @@ enabled_rules = [
 
 def downloadRules():
     API_URL = "https://api.github.com/repos/sqlfluff/sqlfluff/git/trees/main?recursive=1"
-    response = requests.get(API_URL)
+    response = requests.get(API_URL,timeout=10)
     response.raise_for_status()
     tree = response.json().get("tree", [])
 
@@ -57,7 +55,8 @@ def downloadRules():
         if path.startswith("src/sqlfluff/rules/") and path.endswith(".py"):
             print("Downloading", path)
             raw_url = f"https://raw.githubusercontent.com/sqlfluff/sqlfluff/main/{path}"
-            r = requests.get(raw_url); r.raise_for_status()
+            r = requests.get(raw_url,timeout=10)
+            r.raise_for_status()
             os.makedirs(os.path.dirname(path), exist_ok=True)
             with open(path, "wb") as f:
                 f.write(r.content)
@@ -109,7 +108,7 @@ def get_brief_description(doc):
 def createDescriptions(rules):
     out_dir = "docs/description"
     os.makedirs(out_dir, exist_ok=True)
-    
+
     # 1) Write all current descriptions
     for _, full_id, doc in rules:
         with open(f"{out_dir}/{full_id}.md", "w", encoding="utf8") as f:
@@ -157,6 +156,7 @@ def get_sqlfluff_version():
                 if line.startswith('sqlfluff'):
                     # Split the line at the first occurrence of '==' to get the version
                     package, version = line.split('==') if '==' in line else (line, None)
+                    print(package, version)
                     return version.strip() if version else None
     except FileNotFoundError:
         return "File not found."
