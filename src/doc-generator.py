@@ -150,12 +150,13 @@ def buildPatterns(rules):
 def get_sqlfluff_version():
     """Gets the version of the 'sqlfluff' package from the requirements.txt file."""
     try:
-        with open("requirements.txt", 'r', encoding="utf-8") as file:
+        with open("requirements.txt", 'r') as file:
             for line in file:
                 line = line.strip()
                 if line.startswith('sqlfluff'):
                     # Split the line at the first occurrence of '==' to get the version
-                    version = line.split('==') if '==' in line else (line, None)
+                    package, version = line.split('==') if '==' in line else (line, None)
+                    print(package, version)
                     return version.strip() if version else None
     except FileNotFoundError:
         return "File not found."
