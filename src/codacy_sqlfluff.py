@@ -62,7 +62,6 @@ def readJsonFile(path):
         res = json.loads(file.read())
     return res
 
-
 def run_sqlfluff(options, files, cwd=None):
  
     process = Popen(
