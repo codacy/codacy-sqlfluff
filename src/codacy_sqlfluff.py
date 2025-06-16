@@ -2,7 +2,7 @@ import os
 import sys
 import json
 import jsonpickle
-import subprocess
+from subprocess import Popen, PIPE
 import glob
 import signal
 from contextlib import contextmanager
@@ -62,24 +62,15 @@ def readJsonFile(path):
         res = json.loads(file.read())
     return res
 
-
-def run_sqlfluff(patterns, files, cwd=None):
-    try:
-        # we should always run sqlfluff with --dialect flag and postgres is the default.
-        # if you want to run it with another dialect, you can use the configuration file
-        if len(patterns):
-            cmd = ["sqlfluff", "lint", "--format", "json", "--dialect", "postgres", "--rules"]
-            cmd = cmd + [",".join(patterns)]  + files
-        else:
-            cmd = ["sqlfluff", "lint", "--format", "json"]
-            cmd = cmd + files
-
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, cwd=cwd)
-        stdout = process.communicate()[0]
-        result = stdout.decode("utf-8")
-    except Exception as inst:
-        print(inst)
-        raise
+def run_sqlfluff(options, files, cwd=None):
+ 
+    process = Popen(
+        ["sqlfluff", "lint", "--format", "json"] + options + files,
+        stdout=PIPE,
+        cwd=cwd
+    )
+    stdout = process.communicate()[0]
+    result = stdout.decode("utf-8")
 
     return result
 
@@ -88,9 +79,9 @@ def chunks(lst, n):
     return [lst[i : i + n] for i in range(0, len(lst), n)]
 
 
-def run_sqlfluff_results(patterns, files, cwd):
+def run_sqlfluff_results(options, files, cwd):
     results = []
-    res = run_sqlfluff(patterns, files, cwd)
+    res = run_sqlfluff(options, files, cwd)
     sqlfluff_dicts = json.loads(res)
 
     ### Example of a result
@@ -130,34 +121,36 @@ def walkDirectory(directory):
 
     return list(generate())
 
-
 def readConfiguration(configFile, srcDir):
-    def allFiles():
+    def allFiles(): 
         return walkDirectory(srcDir)
 
     try:
         configuration = readJsonFile(configFile)
-        files = configuration.get("files") or allFiles()
-        tools = [t for t in configuration["tools"] if t["name"] == "sqlfluff"]
-        if tools and "patterns" in tools[0]:
-            sqlfluff = tools[0]
-            ## all patterns have a code and only that code is needed to run --rules flag
-            patterns = [p["patternId"].split("_")[0] for p in sqlfluff.get("patterns") or []]
-        else:
-            patterns = []
+        files = configuration.get('files') or allFiles()
+        tools = [t for t in configuration['tools'] if t['name'] == 'sqlfluff']
 
+        if tools and 'patterns' in tools[0]:
+            sqlfluff = tools[0]
+            tools = [p["patternId"].split("_")[0] for p in sqlfluff.get("patterns") or []]
+            ## all patterns have a code and only that code is needed to run --rules flag
+            listPatterns = ",".join(tools)
+            options = ["--dialect", "postgres", "--rules", listPatterns]
+        else:
+            options = []
     except Exception:
         files = allFiles()
-        patterns = []
-    return (patterns, [f for f in files])
+        options = []
+
+    return (options, [f for f in files])
 
 def run_tool(configFile, srcDir):
-    (patterns, files) = readConfiguration(configFile, srcDir)
+    (options, files) = readConfiguration(configFile, srcDir)
     res = []
     filesWithPath = [os.path.join(f) for f in files]
 
     for chunk in chunks(filesWithPath, 10):
-        res.extend(run_sqlfluff_results(patterns, chunk, srcDir))
+        res.extend(run_sqlfluff_results(options, chunk, srcDir))
 
     for result in res:
         if result.filename.startswith(srcDir):
