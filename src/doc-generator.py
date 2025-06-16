@@ -182,6 +182,25 @@ def writeAllPatternsTests(patterns_data):
             xml_file.write(f'    <module name="{pattern["patternId"]}" />\n')
         # Close the root module
         xml_file.write('</module>\n')
+        
+def writeDescriptionJson(rules):
+    output = []
+    for rule_id, full_id, doc in rules:
+        title = get_brief_description(doc).replace("_", " ")
+        entry = {
+            "patternId": full_id,
+            "title": title,
+            "description": doc.strip(),
+            "timeToFix": 5,
+            "parameters": []
+        }
+        output.append(entry)
+
+    out_path = os.path.join("docs", "description", "description.json")
+    with open(out_path, "w", encoding="utf8") as f:
+        json.dump(output, f, indent=2)
+    print(f"✅ Wrote {len(output)} entries to {out_path}")
+
 
 def main():
     downloadRules()
@@ -189,7 +208,9 @@ def main():
     createDescriptions(rules)
     patterns = buildPatterns(rules)
     writeAllPatternsTests(patterns)
-    print("✅ descriptions and patterns.json generated!")
+    writeDescriptionJson(rules)
+    print("✅ descriptions, patterns.json and description.json generated!")
+
 
 if __name__ == "__main__":
     main()
