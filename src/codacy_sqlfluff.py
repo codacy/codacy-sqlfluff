@@ -64,18 +64,22 @@ def readJsonFile(path):
 
 
 def run_sqlfluff(patterns, files, cwd=None):
-    # we should always run sqlfluff with --dialect flag and postgres is the default.
-    # if you want to run it with another dialect, you can use the configuration file
-    if len(patterns):
-        cmd = ["sqlfluff", "lint", "--format", "json", "--dialect", "postgres", "--rules"]
-        cmd = cmd + [",".join(patterns)]  + files
-    else:
-        cmd = ["sqlfluff", "lint", "--format", "json"]
-        cmd = cmd + files
+    try:
+        # we should always run sqlfluff with --dialect flag and postgres is the default.
+        # if you want to run it with another dialect, you can use the configuration file
+        if len(patterns):
+            cmd = ["sqlfluff", "lint", "--format", "json", "--dialect", "postgres", "--rules"]
+            cmd = cmd + [",".join(patterns)]  + files
+        else:
+            cmd = ["sqlfluff", "lint", "--format", "json"]
+            cmd = cmd + files
 
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, cwd=cwd)
-    stdout = process.communicate()[0]
-    result = stdout.decode("utf-8")
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, cwd=cwd)
+        stdout = process.communicate()[0]
+        result = stdout.decode("utf-8")
+    except Exception as inst:
+        print(inst)
+        raise
 
     return result
 
