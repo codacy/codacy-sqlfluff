@@ -65,7 +65,7 @@ def readJsonFile(path):
 def run_sqlfluff(options, files, cwd=None):
  
     process = Popen(
-        ["sqlfluff", "lint", "--format", "json"],
+        ["sqlfluff", "lint", "--format", "json"] + options + files,
         stdout=PIPE,
         cwd=cwd
     )
@@ -142,7 +142,6 @@ def readConfiguration(configFile, srcDir):
         files = allFiles()
         options = []
 
-    print(options)
     return (options, [f for f in files])
 
 def run_tool(configFile, srcDir):
