@@ -143,6 +143,7 @@ def readConfiguration(configFile, srcDir):
         files = allFiles()
         options = []
 
+    print(options)
     return (options, [f for f in files])
 
 def run_tool(configFile, srcDir):
