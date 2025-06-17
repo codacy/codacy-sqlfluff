@@ -135,7 +135,10 @@ def readConfiguration(configFile, srcDir):
             tools = [p["patternId"].split("_")[0] for p in sqlfluff.get("patterns") or []]
             ## all patterns have a code and only that code is needed to run --rules flag
             listPatterns = ",".join(tools)
-            options = ["--dialect", "postgres", "--rules", listPatterns]
+            if len(listPatterns) != 0:
+                options = ["--dialect", "postgres", "--rules", listPatterns]
+            else:
+                options = []
         else:
             options = []
     except Exception:
