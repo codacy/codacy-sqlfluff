@@ -63,7 +63,7 @@ If you want to ignore some of the rules, please use the same configuration file:
 
 ```text
 [sqlfluff]
-dialect = postgres
+dialect = oracle
 exclude_rules = LT01,RF01
 ```
 
