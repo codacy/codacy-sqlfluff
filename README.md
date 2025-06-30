@@ -43,7 +43,12 @@ Compatible with Python 3.13
 -  .sqlfluff
 -  pyproject.toml
 
-### Note: If you have multiple configuration files in your repository, they will be taken into consideration for the analysis of each file where the tool finds the configuration files
+## What happens if I have multiple configuration files in my repository?
+The configuration file at the root of the repository defines the main configuration for the project. Configuration files located in subdirectories can override or extend this main configuration, but they cannot relax or revert any restrictions defined at the root level.
+
+For example, if a pattern is ignored in the root configuration, it remains ignored in all subdirectories. Subdirectory configurations can ignore additional patterns, but cannot re-enable those that were disabled at the root.
+
+This ensures consistent baseline behavior across the project, while still allowing directory-specific customization when needed.
 
 ## How to run SQLFluff for the dialect of my codebase
 By default, we run SQLFluff with the dialect Postgres because the flag --dialect is mandatory. If your codebase is based on another dialect above, please create a simple **.sqlfluff** config file in the root of your repository with the following content (let's use Oracle as an example):
