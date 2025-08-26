@@ -82,7 +82,28 @@ def chunks(lst, n):
 def run_sqlfluff_results(options, files, cwd):
     results = []
     res = run_sqlfluff(options, files, cwd)
-    sqlfluff_dicts = json.loads(res)
+    
+    # Check if the result is an empty string. If so, there are no violations.
+    if not res:
+        return []
+
+    try:
+        sqlfluff_dicts = json.loads(res)
+        for res_dict in sqlfluff_dicts:
+            # Ensure 'violations' key exists and is not empty
+            if 'violations' in res_dict and res_dict['violations']:
+                for issue in res_dict['violations']:
+                    filename = res_dict["filepath"]
+                    message = f"{issue['description']} ({issue['code']})"
+                    patternId = f"{issue['code']}_{issue['name']}"
+                    line = issue["start_line_no"]
+                    results.append(Result(filename, message, patternId, line))
+    except json.JSONDecodeError:
+        # This prevents the program from crashing on malformed JSON.
+        print(f"Error decoding JSON from sqlfluff output: {res}", file=sys.stderr)
+        return []
+
+    return results
 
     ### Example of a result
     #
@@ -102,16 +123,6 @@ def run_sqlfluff_results(options, files, cwd):
     #     "end_file_pos": 28
     # }
     # ]
-
-    for res in sqlfluff_dicts:
-        for issue in res['violations']:
-            filename = res["filepath"]
-            message = f"{issue['description']} ({issue['code']})"
-            patternId = f"{issue['code']}_{issue['name']}"
-            line = issue["start_line_no"]
-            results.append(Result(filename, message, patternId, line))
-    return results
-
 
 def walkDirectory(directory):
     def generate():
