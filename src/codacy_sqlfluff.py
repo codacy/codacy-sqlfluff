@@ -7,6 +7,7 @@ import glob
 import signal
 from contextlib import contextmanager
 import traceback
+import tempfile
 
 
 @contextmanager
@@ -153,18 +154,20 @@ def readConfiguration(configFile, srcDir):
             listPatterns = ",".join(patterns)
 
             # Generate a temporary sqlfluff config file
-            generated_config_path = "/tmp/generated_sqlfluff.conf"
-            with open(generated_config_path, "w") as f:
-                f.write("[sqlfluff]\n")
-                f.write(f"dialect = {dialect}\n")
-                f.write(f"large_file_skip_byte_limit = {skip_byte_limit_flag}\n")
-                if listPatterns:
-                        f.write(f"rules = {listPatterns}\n")
-                else:
-                        f.write(f"exclude_rules = all\n")
-                
+            tmp = tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.sqlfluff')
+            tmp.write("[sqlfluff]\n")
+            tmp.write(f"dialect = {dialect}\n")
+            tmp.write(f"large_file_skip_byte_limit = {skip_byte_limit_flag}\n")
+
+            # Write rules or exclude all rules based on patterns on .codacyrc
+            if listPatterns:
+                tmp.write(f"rules = {listPatterns}\n")
+            else:
+                tmp.write("exclude_rules = all\n")
+            tmp.close()
+
             # Add the generated config file to options
-            options.extend(["--config", generated_config_path])
+            options.extend(["--config", tmp.name])
 
     except Exception:
         files = allFiles()
