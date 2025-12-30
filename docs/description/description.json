@@ -161,6 +161,20 @@
     "parameters": []
   },
   {
+    "patternId": "TQ03_tsql.empty_batch",
+    "title": "Remove empty batches",
+    "description": "Remove empty batches.\n\n**Anti-pattern**\n\nEmpty batches (containing only GO statements) should be removed.\n\n.. code-block:: sql\n   :force:\n\n    CREATE TABLE dbo.test (\n        testcol1 INT NOT NULL,\n        testcol2 INT NOT NULL\n    );\n\n    GO\n\n    GO\n\n**Best practice**\n\nRemove empty batches.\n\n.. code-block:: sql\n   :force:\n\n    CREATE TABLE dbo.test (\n        testcol1 INT NOT NULL,\n        testcol2 INT NOT NULL\n    );\n\n    GO",
+    "timeToFix": 5,
+    "parameters": []
+  },
+  {
+    "patternId": "TQ02_tsql.procedure_begin_end",
+    "title": "Procedure bodies with multiple statements",
+    "description": "Procedure bodies with multiple statements should be wrapped in BEGIN/END.\n\n**Anti-pattern**\n\nProcedure bodies with multiple statements should be wrapped in BEGIN/END\nfor clarity and consistency.\n\n.. code-block:: sql\n   :force:\n\n    CREATE PROCEDURE Reporting.MultipleStatements\n    AS\n    SELECT\n        [ID],\n        [DataDate],\n        [CaseOutput]\n    FROM Table1;\n\n    SELECT\n        [ID],\n        [DataDate],\n        [CaseOutput]\n    FROM Table2;\n\n**Best practice**\n\nWrap procedure bodies with multiple statements in BEGIN/END blocks.\n\n.. code-block:: sql\n   :force:\n\n    CREATE PROCEDURE Reporting.MultipleStatements\n    AS\n    BEGIN\n        SELECT\n            [ID],\n            [DataDate],\n            [CaseOutput]\n        FROM Table1;\n\n        SELECT\n            [ID],\n            [DataDate],\n            [CaseOutput]\n        FROM Table2;\n    END",
+    "timeToFix": 5,
+    "parameters": []
+  },
+  {
     "patternId": "CV09_convention.blocked_words",
     "title": "Block a list of configurable",
     "description": "Block a list of configurable words from being used.\n\nThis generic rule can be useful to prevent certain keywords, functions, or objects\nfrom being used. Only whole words can be blocked, not phrases, nor parts of words.\n\nThis block list is case insensitive.\n\n**Example use cases**\n\n* We prefer ``BOOL`` over ``BOOLEAN`` and there is no existing rule to enforce\n  this. Until such a rule is written, we can add ``BOOLEAN`` to the deny list\n  to cause a linting error to flag this.\n* We have deprecated a schema/table/function and want to prevent it being used\n  in future. We can add that to the denylist and then add a ``-- noqa: CV09`` for\n  the few exceptions that still need to be in the code base for now.\n\n**Anti-pattern**\n\nIf the ``blocked_words`` config is set to ``deprecated_table,bool`` then the\nfollowing will flag:\n\n.. code-block:: sql\n\n    SELECT * FROM deprecated_table WHERE 1 = 1;\n    CREATE TABLE myschema.t1 (a BOOL);\n\n**Best practice**\n\nDo not used any blocked words:\n\n.. code-block:: sql\n\n    SELECT * FROM another_table WHERE 1 = 1;\n    CREATE TABLE myschema.t1 (a BOOLEAN);",
@@ -294,6 +308,13 @@
     "parameters": []
   },
   {
+    "patternId": "AM09_ambiguous.order_by_limit",
+    "title": "Use of limit and offset",
+    "description": "Use of LIMIT and OFFSET without ORDER BY may lead to non-deterministic results.\n\nWhen using ``LIMIT`` or ``OFFSET``, it's generally recommended to include\nan ``ORDER BY`` clause to ensure deterministic results.\n\n**Anti-pattern**\n\nThe following query has LIMIT and OFFSET without ORDER BY, which may return\ndifferent results in successive executions.\n\n.. code-block:: sql\n\n    SELECT *\n    FROM foo\n    LIMIT 10 OFFSET 5;\n\n**Best practice**\n\nInclude an ``ORDER BY`` clause:\n\n.. code-block:: sql\n\n    SELECT *\n    FROM foo\n    ORDER BY id\n    LIMIT 10 OFFSET 5;",
+    "timeToFix": 5,
+    "parameters": []
+  },
+  {
     "patternId": "AM08_ambiguous.join_condition",
     "title": "Implicit cross join detected",
     "description": "Implicit cross join detected.\n\n**Anti-pattern**\n\nCross joins are valid, but rare in the wild - and more often created by mistake\nthan on purpose. This rule catches situations where a cross join has been specified,\nbut not explicitly and so the risk of a mistaken cross join is highly likely.\n\n.. code-block:: sql\n   :force:\n\n    SELECT\n        foo\n    FROM bar\n    JOIN baz;\n\n**Best practice**\n\nUse CROSS JOIN.\n\n.. code-block:: sql\n   :force:\n\n    SELECT\n        foo\n    FROM bar\n    CROSS JOIN baz;",
@@ -378,6 +399,13 @@
     "parameters": []
   },
   {
+    "patternId": "ST12_structure.consecutive_semicolons",
+    "title": "Consecutive semicolons detected",
+    "description": "Consecutive semicolons detected.\n\nThis rule flags runs of two or more semicolons (optionally with intervening\nwhitespace/newlines) which usually indicate an empty statement or an\naccidental duplicate terminator.\n\n**Anti-pattern**\n\n.. code-block:: sql\n   :force:\n\n    SELECT 1;;\n    ;;SELECT 2;\n\n**Best practice**\n\nCollapse duplicate semicolons unless intentionally separating batches.\n\n.. code-block:: sql\n   :force:\n\n    SELECT 1;\n    SELECT 2;",
+    "timeToFix": 5,
+    "parameters": []
+  },
+  {
     "patternId": "ST02_structure.simple_case",
     "title": "Unnecessary ``case`` statement",
     "description": "Unnecessary ``CASE`` statement.\n\n**Anti-pattern**\n\n``CASE`` statement returns booleans.\n\n.. code-block:: sql\n    :force:\n\n    select\n        case\n            when fab > 0 then true\n            else false\n        end as is_fab\n    from fancy_table\n\n    -- This rule can also simplify CASE statements\n    -- that aim to fill NULL values.\n\n    select\n        case\n            when fab is null then 0\n            else fab\n        end as fab_clean\n    from fancy_table\n\n    -- This also covers where the case statement\n    -- replaces NULL values with NULL values.\n\n    select\n        case\n            when fab is null then null\n            else fab\n        end as fab_clean\n    from fancy_table\n\n**Best practice**\n\nReduce to ``WHEN`` condition within ``COALESCE`` function.\n\n.. code-block:: sql\n    :force:\n\n    select\n        coalesce(fab > 0, false) as is_fab\n    from fancy_table\n\n    -- To fill NULL values.\n\n    select\n        coalesce(fab, 0) as fab_clean\n    from fancy_table\n\n    -- NULL filling NULL.\n\n    select fab as fab_clean\n    from fancy_table",
@@ -408,7 +436,7 @@
   {
     "patternId": "ST11_structure.unused_join",
     "title": "Joined table not referenced in",
-    "description": "Joined table not referenced in query.\n\nThis rule will check if there are any tables that are referenced in the\n``FROM`` or ``JOIN`` clause of a ``SELECT`` statement, but where no\ncolumns from that table are referenced in the any of the other clauses.\nBecause some types of join are often used as filters, or to otherwise\ncontrol granularity without being referenced (e.g. ``INNER`` and ``CROSS``),\nthis rule only applies to explicit ``OUTER`` joins (i.e. ``LEFT``, ``RIGHT``\nand ``FULL`` joins).\n\nThis rule relies on all of the column references in the ``SELECT``\nstatement being qualified with at least the table name, and so is\ndesigned to work alongside :sqlfluff:ref:`references.qualification`\n(:sqlfluff:ref:`RF02`). This is because without the knowledge of what\ncolumns exist in each upstream table, the rule is unable to resolve\nwhich table an unqualified column reference is pulled from.\n\nThis rule does not propose a fix, because it assumes that it an unused\ntable is a mistake, but doesn't know whether the mistake was the join,\nor the mistake was not using it.\n\n**Anti-pattern**\n\nIn this example, the table ``bar`` is included in the ``JOIN`` clause\nbut not columns from it are referenced in\n\n.. code-block:: sql\n\n    SELECT\n        foo.a,\n        foo.b\n    FROM foo\n    LEFT JOIN bar ON foo.a = bar.a\n\n**Best practice**\n\nRemove the join, or use the table.\n\n.. code-block:: sql\n\n    SELECT foo.a, vee.b\n    FROM foo;\n\n    SELECT\n        foo.a,\n        foo.b,\n        bar.c\n    FROM foo\n    LEFT JOIN bar ON foo.a = bar.a\n\nIn the (*very rare*) situations that it is logically necessary to include\na table in a join clause, but not otherwise refer to it (likely for\ngranularity reasons, or as a stepping stone to another table), we recommend\nignoring this rule for that specific line by using ``-- noqa: ST11`` at\nthe end of the line.\n\n.. note:\n\n   To avoid sticky situations with casing and quoting in different dialects\n   this rule uses case-insensitive comparison. That means if you have two\n   tables with the same name, but different cases (and you're really sure\n   that's a good idea!), then this rule may not detect if one of them is\n   unused.",
+    "description": "Joined table not referenced in query.\n\nThis rule will check if any tables are referenced in the\n``FROM`` or ``JOIN`` clause of a ``SELECT`` statement where no\ncolumns from that table are referenced in any of the other clauses.\nBecause some types of joins are often used as filters or to otherwise\ncontrol granularity without being referenced (e.g. ``INNER`` and ``CROSS``),\nthis rule only applies to explicit ``OUTER`` joins (i.e. ``LEFT``, ``RIGHT``,\nand ``FULL`` joins).\n\nThis rule relies on all of the column references in the ``SELECT``\nstatement being qualified with at least the table name, and so is\ndesigned to work alongside :sqlfluff:ref:`references.qualification`\n(:sqlfluff:ref:`RF02`). This is because, without the knowledge of what\ncolumns exist in each upstream table, the rule is unable to resolve\nwhich table an unqualified column reference is pulled from.\n\nThis rule does not propose a fix because it assumes that an unused\ntable is a mistake, but it doesn't know whether the mistake was due to the join\nor the failure to use the table.\n\n**Anti-pattern**\n\nIn this example, the table ``bar`` is included in the ``JOIN`` clause\nbut not columns from it are referenced in\n\n.. code-block:: sql\n\n    SELECT\n        foo.a,\n        foo.b\n    FROM foo\n    LEFT JOIN bar ON foo.a = bar.a\n\n**Best practice**\n\nRemove the join, or use the table.\n\n.. code-block:: sql\n\n    SELECT foo.a, vee.b\n    FROM foo;\n\n    SELECT\n        foo.a,\n        foo.b,\n        bar.c\n    FROM foo\n    LEFT JOIN bar ON foo.a = bar.a\n\nIn the (*very rare*) situations that it is logically necessary to include\na table in a join clause, but not otherwise refer to it (likely for\ngranularity reasons, or as a stepping stone to another table), we recommend\nignoring this rule for that specific line by using ``-- noqa: ST11`` at\nthe end of the line.\n\n.. note:\n\n   To avoid sticky situations with casing and quoting in different dialects\n   this rule uses case-insensitive comparison. That means if you have two\n   tables with the same name, but different cases (and you're really sure\n   that's a good idea!), then this rule may not detect if one of them is\n   unused.",
     "timeToFix": 5,
     "parameters": []
   },

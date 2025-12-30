@@ -136,25 +136,38 @@ def readConfiguration(configFile, srcDir):
     def allFiles(): 
         return walkDirectory(srcDir)
 
+    options = []
+    
+    # Default sqlfluff configuration
+    dialect = "postgres"
+    skip_byte_limit_flag = 150000
+
     try:
         configuration = readJsonFile(configFile)
         files = configuration.get('files') or allFiles()
         tools = [t for t in configuration['tools'] if t['name'] == 'sqlfluff']
 
         if tools and 'patterns' in tools[0]:
-            sqlfluff = tools[0]
-            tools = [p["patternId"].split("_")[0] for p in sqlfluff.get("patterns") or []]
-            ## all patterns have a code and only that code is needed to run --rules flag
-            listPatterns = ",".join(tools)
-            if len(listPatterns) != 0:
-                options = ["--dialect", "postgres", "--rules", listPatterns]
-            else:
-                options = []
-        else:
-            options = []
+            sqlfluff_tool = tools[0]
+            patterns = [p["patternId"].split("_")[0] for p in sqlfluff_tool.get("patterns") or []]
+            listPatterns = ",".join(patterns)
+
+            # Generate a temporary sqlfluff config file
+            generated_config_path = "/tmp/generated_sqlfluff.conf"
+            with open(generated_config_path, "w") as f:
+                f.write("[sqlfluff]\n")
+                f.write(f"dialect = {dialect}\n")
+                f.write(f"large_file_skip_byte_limit = {skip_byte_limit_flag}\n")
+                if listPatterns:
+                        f.write(f"rules = {listPatterns}\n")
+                else:
+                        f.write(f"exclude_rules = all\n")
+                
+            # Add the generated config file to options
+            options.extend(["--config", generated_config_path])
+
     except Exception:
         files = allFiles()
-        options = []
 
     return (options, [f for f in files])
 

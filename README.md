@@ -9,7 +9,7 @@ Compatible with Python 3.13
 
 
 ## Dialects compatibility
--  ansi
+-  ansi sql
 -  athena
 -  bigquery
 -  clickhouse
@@ -17,6 +17,7 @@ Compatible with Python 3.13
 -  db2
 -  duckdb
 -  exasol
+-  flinksql
 -  greenplum
 -  hive
 -  impala
