@@ -8,6 +8,7 @@ import signal
 from contextlib import contextmanager
 import traceback
 import tempfile
+import logging
 
 
 @contextmanager
