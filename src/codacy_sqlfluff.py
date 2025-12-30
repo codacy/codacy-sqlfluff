@@ -133,46 +133,53 @@ def walkDirectory(directory):
 
     return list(generate())
 
-def readConfiguration(configFile, srcDir):
-    def allFiles(): 
-        return walkDirectory(srcDir)
+import tempfile
+import os
+import logging
 
+def readConfiguration(configFile, src_dir):
+
+    def get_all_files():
+        return walkDirectory(src_dir)
+
+    # Defaults
     options = []
-    
-    # Default sqlfluff configuration
+    files = []
     dialect = "postgres"
-    skip_byte_limit_flag = 150000
+    skip_limit = 150000
 
     try:
-        configuration = readJsonFile(configFile)
-        files = configuration.get('files') or allFiles()
-        tools = [t for t in configuration['tools'] if t['name'] == 'sqlfluff']
+        config_data = readJsonFile(configFile)
+        files = config_data.get('files') or get_all_files()
+        
+        # Find the sqlfluff tool configuration
+        tools = [t for t in config_data['tools'] if t['name'] == 'sqlfluff']
+        patterns = tools[0].get('patterns', []) if tools else []
 
         if tools and 'patterns' in tools[0]:
-            sqlfluff_tool = tools[0]
-            patterns = [p["patternId"].split("_")[0] for p in sqlfluff_tool.get("patterns") or []]
-            listPatterns = ",".join(patterns)
+            # Extract pattern IDs
+            rule_ids = [p["patternId"].split("_")[0] for p in patterns if "patternId" in p]
+            rules_str = ",".join(rule_ids)
 
-            # Generate a temporary sqlfluff config file
-            tmp = tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.sqlfluff')
-            tmp.write("[sqlfluff]\n")
-            tmp.write(f"dialect = {dialect}\n")
-            tmp.write(f"large_file_skip_byte_limit = {skip_byte_limit_flag}\n")
+            # Create the temporary config file
+            # delete=False is necessary because we need the path to persist after closing
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.cfg', delete=False) as tmp:
+                content = [
+                    "[sqlfluff]",
+                    f"dialect = {dialect}",
+                    f"large_file_skip_byte_limit = {skip_limit}",
+                    f"rules = {rules_str}" if rules_str else "exclude_rules = all"
+                ]
+                tmp.write("\n".join(content))
+                config_path = tmp.name
 
-            # Write rules or exclude all rules based on patterns on .codacyrc
-            if listPatterns:
-                tmp.write(f"rules = {listPatterns}\n")
-            else:
-                tmp.write("exclude_rules = all\n")
-            tmp.close()
+            options.extend(["--config", config_path, "--ignore-local-config"])
 
-            # Add the generated config file to options
-            options.extend(["--config", tmp.name])
+    except Exception as e:
+        logging.error(f"Failed to parse configuration: {e}")
+        files = get_all_files()
 
-    except Exception:
-        files = allFiles()
-
-    return (options, [f for f in files])
+    return options, files
 
 def run_tool(configFile, srcDir):
     (options, files) = readConfiguration(configFile, srcDir)
