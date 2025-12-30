@@ -133,10 +133,6 @@ def walkDirectory(directory):
 
     return list(generate())
 
-import tempfile
-import os
-import logging
-
 def readConfiguration(configFile, src_dir):
 
     def get_all_files():
@@ -171,6 +167,8 @@ def readConfiguration(configFile, src_dir):
                     f"rules = {rules_str}" if rules_str else "exclude_rules = all"
                 ]
                 tmp.write("\n".join(content))
+                tmp.close()
+
                 config_path = tmp.name
 
             options.extend(["--config", config_path, "--ignore-local-config"])
