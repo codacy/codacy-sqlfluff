@@ -7,6 +7,8 @@ import glob
 import signal
 from contextlib import contextmanager
 import traceback
+import tempfile
+import logging
 
 
 @contextmanager
@@ -132,31 +134,51 @@ def walkDirectory(directory):
 
     return list(generate())
 
-def readConfiguration(configFile, srcDir):
-    def allFiles(): 
-        return walkDirectory(srcDir)
+def readConfiguration(configFile, src_dir):
+
+    def get_all_files():
+        return walkDirectory(src_dir)
+
+    # Defaults
+    options = []
+    files = []
+    dialect = "postgres"
+    skip_limit = 150000
 
     try:
-        configuration = readJsonFile(configFile)
-        files = configuration.get('files') or allFiles()
-        tools = [t for t in configuration['tools'] if t['name'] == 'sqlfluff']
+        config_data = readJsonFile(configFile)
+        files = config_data.get('files') or get_all_files()
+        
+        # Find the sqlfluff tool configuration
+        tools = [t for t in config_data['tools'] if t['name'] == 'sqlfluff']
+        patterns = tools[0].get('patterns', []) if tools else []
 
         if tools and 'patterns' in tools[0]:
-            sqlfluff = tools[0]
-            tools = [p["patternId"].split("_")[0] for p in sqlfluff.get("patterns") or []]
-            ## all patterns have a code and only that code is needed to run --rules flag
-            listPatterns = ",".join(tools)
-            if len(listPatterns) != 0:
-                options = ["--dialect", "postgres", "--rules", listPatterns]
-            else:
-                options = []
-        else:
-            options = []
-    except Exception:
-        files = allFiles()
-        options = []
+            # Extract pattern IDs
+            rule_ids = [p["patternId"].split("_")[0] for p in patterns if "patternId" in p]
+            rules_str = ",".join(rule_ids)
 
-    return (options, [f for f in files])
+            # Create the temporary config file
+            # delete=False is necessary because we need the path to persist after closing
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.cfg', delete=False) as tmp:
+                content = [
+                    "[sqlfluff]",
+                    f"dialect = {dialect}",
+                    f"large_file_skip_byte_limit = {skip_limit}",
+                    f"rules = {rules_str}" if rules_str else "exclude_rules = all"
+                ]
+                tmp.write("\n".join(content))
+                tmp.close()
+
+                config_path = tmp.name
+
+            options.extend(["--config", config_path, "--ignore-local-config"])
+
+    except Exception as e:
+        logging.error(f"Failed to parse configuration: {e}")
+        files = get_all_files()
+
+    return options, files
 
 def run_tool(configFile, srcDir):
     (options, files) = readConfiguration(configFile, srcDir)

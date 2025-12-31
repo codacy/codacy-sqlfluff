@@ -1,6 +1,6 @@
 {
   "name": "sqlfluff",
-  "version": "3.4.2",
+  "version": "3.5.0",
   "patterns": [
     {
       "patternId": "JJ01_jinja.padding",
@@ -164,6 +164,20 @@
       "enabled": false
     },
     {
+      "patternId": "TQ03_tsql.empty_batch",
+      "level": "Warning",
+      "category": "CodeStyle",
+      "parameters": [],
+      "enabled": false
+    },
+    {
+      "patternId": "TQ02_tsql.procedure_begin_end",
+      "level": "Warning",
+      "category": "CodeStyle",
+      "parameters": [],
+      "enabled": false
+    },
+    {
       "patternId": "CV09_convention.blocked_words",
       "level": "Info",
       "category": "BestPractice",
@@ -297,6 +311,13 @@
       "enabled": false
     },
     {
+      "patternId": "AM09_ambiguous.order_by_limit",
+      "level": "Error",
+      "category": "ErrorProne",
+      "parameters": [],
+      "enabled": false
+    },
+    {
       "patternId": "AM08_ambiguous.join_condition",
       "level": "Error",
       "category": "ErrorProne",
@@ -379,6 +400,13 @@
       "category": "ErrorProne",
       "parameters": [],
       "enabled": true
+    },
+    {
+      "patternId": "ST12_structure.consecutive_semicolons",
+      "level": "Error",
+      "category": "ErrorProne",
+      "parameters": [],
+      "enabled": false
     },
     {
       "patternId": "ST02_structure.simple_case",

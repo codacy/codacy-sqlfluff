@@ -25,6 +25,8 @@
     <module name="LT01_layout.spacing" />
     <module name="LT11_layout.set_operators" />
     <module name="TQ01_tsql.sp_prefix" />
+    <module name="TQ03_tsql.empty_batch" />
+    <module name="TQ02_tsql.procedure_begin_end" />
     <module name="CV09_convention.blocked_words" />
     <module name="CV08_convention.left_join" />
     <module name="CV07_convention.statement_brackets" />
@@ -44,6 +46,7 @@
     <module name="AM03_ambiguous.order_by" />
     <module name="AM02_ambiguous.union" />
     <module name="AM06_ambiguous.column_references" />
+    <module name="AM09_ambiguous.order_by_limit" />
     <module name="AM08_ambiguous.join_condition" />
     <module name="AL04_aliasing.unique.table" />
     <module name="AL05_aliasing.unused" />
@@ -56,6 +59,7 @@
     <module name="AL09_aliasing.self_alias.column" />
     <module name="ST07_structure.using" />
     <module name="ST03_structure.unused_cte" />
+    <module name="ST12_structure.consecutive_semicolons" />
     <module name="ST02_structure.simple_case" />
     <module name="ST06_structure.column_order" />
     <module name="ST09_structure.join_condition_order" />
