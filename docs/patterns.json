@@ -159,7 +159,7 @@
     {
       "patternId": "OR01_oracle.empty_batch",
       "level": "Info",
-      "category": "Other",
+      "category": "ErrorProne",
       "parameters": [],
       "enabled": false
     },
