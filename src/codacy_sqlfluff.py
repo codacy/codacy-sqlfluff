@@ -12,15 +12,23 @@ import logging
 
 
 @contextmanager
-def timeout(time):
-    # Register a function to raise a TimeoutError on the signal.
-    signal.signal(signal.SIGALRM, lambda: sys.exit(2))
-    # Schedule the signal to be sent after ``time``.
-    signal.alarm(time)
-    yield
+def timeout(time_seconds):
+    def handle_timeout(signum, frame):
+        # Using stderr ensures this shows up even if stdout is being redirected
+        print(f"\n[FATAL] SQLFluff reached the {time_seconds}s timeout limit.", file=sys.stderr)
+        print("This usually happens on large repositories or complex SQL files.", file=sys.stderr)
+        sys.exit(2)
+
+    signal.signal(signal.SIGALRM, handle_timeout)
+    signal.alarm(time_seconds)
+    
+    try:
+        yield
+    finally:
+        signal.alarm(0)
 
 
-DEFAULT_TIMEOUT = 15 * 60
+DEFAULT_TIMEOUT = 10 * 60
 
 
 def getTimeout(timeoutString):
@@ -143,7 +151,6 @@ def readConfiguration(configFile, src_dir):
     options = []
     files = []
     dialect = "postgres"
-    skip_limit = 150000
 
     try:
         config_data = readJsonFile(configFile)
@@ -164,7 +171,6 @@ def readConfiguration(configFile, src_dir):
                 content = [
                     "[sqlfluff]",
                     f"dialect = {dialect}",
-                    f"large_file_skip_byte_limit = {skip_limit}",
                     f"rules = {rules_str}" if rules_str else "exclude_rules = all"
                 ]
                 tmp.write("\n".join(content))

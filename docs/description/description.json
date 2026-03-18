@@ -154,6 +154,13 @@
     "parameters": []
   },
   {
+    "patternId": "OR01_oracle.empty_batch",
+    "title": "Remove empty batches",
+    "description": "Remove empty batches.\n\n**Anti-pattern**\n\nEmpty batches (containing only / statements) should be removed.\n\n.. code-block:: sql\n   :force:\n\n    SELECT 1 FROM DUAL;\n\n    /\n\n    /\n\n**Best practice**\n\nRemove empty batches.\n\n.. code-block:: sql\n   :force:\n\n    SELECT 1 FROM DUAL;\n\n    /",
+    "timeToFix": 5,
+    "parameters": []
+  },
+  {
     "patternId": "TQ01_tsql.sp_prefix",
     "title": "``sp `` prefix should not be",
     "description": "``SP_`` prefix should not be used for user-defined stored procedures in T-SQL.\n\n**Anti-pattern**\n\nThe ``SP_`` prefix is used to identify system procedures and can adversely\naffect performance of the user-defined stored procedure. It can also break\nsystem procedures if there is a naming conflict.\n\n.. code-block:: sql\n   :force:\n\n    CREATE PROCEDURE dbo.sp_pull_data\n    AS\n    SELECT\n        ID,\n        DataDate,\n        CaseOutput\n    FROM table1\n\n**Best practice**\n\nUse a different name for the stored procedure.\n\n.. code-block:: sql\n   :force:\n\n    CREATE PROCEDURE dbo.pull_data\n    AS\n    SELECT\n        ID,\n        DataDate,\n        CaseOutput\n    FROM table1\n\n    -- Alternatively prefix with USP_ to\n    -- indicate a user-defined stored procedure.\n\n    CREATE PROCEDURE dbo.usp_pull_data\n    AS\n    SELECT\n        ID,\n        DataDate,\n        CaseOutput\n    FROM table1",
