@@ -1,6 +1,6 @@
 {
   "name": "sqlfluff",
-  "version": "3.5.0",
+  "version": "4.0.4",
   "patterns": [
     {
       "patternId": "JJ01_jinja.padding",
@@ -153,6 +153,13 @@
       "patternId": "LT11_layout.set_operators",
       "level": "Info",
       "category": "CodeStyle",
+      "parameters": [],
+      "enabled": false
+    },
+    {
+      "patternId": "OR01_oracle.empty_batch",
+      "level": "Info",
+      "category": "ErrorProne",
       "parameters": [],
       "enabled": false
     },

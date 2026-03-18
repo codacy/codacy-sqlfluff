@@ -24,7 +24,8 @@ category_mapping = {
     "JJ": "Compatibility",  
     "RF": "ErrorProne",      
     "ST": "ErrorProne",      
-    "TQ": "CodeStyle",       
+    "TQ": "CodeStyle",
+    "OR": "ErrorProne"
 }
 
 enabled_rules = [
@@ -126,7 +127,7 @@ def buildPatterns(rules):
     for rule_id, full_id, _ in rules:
         prefix = rule_id[:2]
         level = severity_mapping.get(prefix, "Info")
-        category = category_mapping.get(prefix, "Other")
+        category = category_mapping.get(prefix, "CodeStyle")
         patterns.append({
             "patternId": full_id,
             "level": level,

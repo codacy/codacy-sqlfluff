@@ -24,6 +24,7 @@
     <module name="LT15_layout.newlines" />
     <module name="LT01_layout.spacing" />
     <module name="LT11_layout.set_operators" />
+    <module name="OR01_oracle.empty_batch" />
     <module name="TQ01_tsql.sp_prefix" />
     <module name="TQ03_tsql.empty_batch" />
     <module name="TQ02_tsql.procedure_begin_end" />
