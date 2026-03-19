@@ -75,7 +75,7 @@ def readJsonFile(path):
 def run_sqlfluff(options, files, cwd=None):
  
     process = Popen(
-        ["sqlfluff", "lint", "--format", "json"] + options + files,
+        ["sqlfluff", "lint", "--format", "json", "--processes", "0"] + options + files,
         stdout=PIPE,
         cwd=cwd
     )
@@ -191,7 +191,7 @@ def run_tool(configFile, srcDir):
     res = []
     filesWithPath = [os.path.join(f) for f in files]
 
-    for chunk in chunks(filesWithPath, 10):
+    for chunk in chunks(filesWithPath, 500):
         res.extend(run_sqlfluff_results(options, chunk, srcDir))
 
     for result in res:
