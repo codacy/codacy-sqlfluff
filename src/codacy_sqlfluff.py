@@ -28,7 +28,7 @@ def timeout(time_seconds):
         signal.alarm(0)
 
 
-DEFAULT_TIMEOUT = 10 * 60
+DEFAULT_TIMEOUT = 15 * 60
 
 
 def getTimeout(timeoutString):
@@ -75,7 +75,7 @@ def readJsonFile(path):
 def run_sqlfluff(options, files, cwd=None):
  
     process = Popen(
-        ["sqlfluff", "lint", "--format", "json", "--processes", "0"] + options + files,
+        ["sqlfluff", "lint", "--format", "json"] + options + files,
         stdout=PIPE,
         cwd=cwd
     )
