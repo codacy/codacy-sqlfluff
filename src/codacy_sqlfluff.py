@@ -75,7 +75,7 @@ def readJsonFile(path):
 def run_sqlfluff(options, files, cwd=None):
  
     process = Popen(
-        ["sqlfluff", "lint", "--format", "json"] + options + files,
+        ["sqlfluff", "lint", "--format", "json", "--processes", "0"] + options + files,
         stdout=PIPE,
         cwd=cwd
     )
