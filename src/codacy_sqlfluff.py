@@ -160,7 +160,7 @@ def readConfiguration(configFile, src_dir):
         tools = [t for t in config_data['tools'] if t['name'] == 'sqlfluff']
         patterns = tools[0].get('patterns', []) if tools else []
 
-        if tools and 'patterns' in tools[0]:
+        if tools and tools[0].get('patterns'):
             # Extract pattern IDs
             rule_ids = [p["patternId"].split("_")[0] for p in patterns if "patternId" in p]
             rules_str = ",".join(rule_ids)
