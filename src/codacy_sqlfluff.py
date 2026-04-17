@@ -160,7 +160,7 @@ def readConfiguration(configFile, src_dir):
         tools = [t for t in config_data['tools'] if t['name'] == 'sqlfluff']
         patterns = tools[0].get('patterns', []) if tools else []
 
-        if tools and 'patterns' in tools[0]:
+        if tools and tools[0].get('patterns'):
             # Extract pattern IDs
             rule_ids = [p["patternId"].split("_")[0] for p in patterns if "patternId" in p]
             rules_str = ",".join(rule_ids)
@@ -171,6 +171,7 @@ def readConfiguration(configFile, src_dir):
                 content = [
                     "[sqlfluff]",
                     f"dialect = {dialect}",
+                    "large_file_skip_byte_limit = 0",
                     f"rules = {rules_str}" if rules_str else "exclude_rules = all"
                 ]
                 tmp.write("\n".join(content))
@@ -191,7 +192,7 @@ def run_tool(configFile, srcDir):
     res = []
     filesWithPath = [os.path.join(f) for f in files]
 
-    for chunk in chunks(filesWithPath, 500):
+    for chunk in chunks(filesWithPath, 50):
         res.extend(run_sqlfluff_results(options, chunk, srcDir))
 
     for result in res:

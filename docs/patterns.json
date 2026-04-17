@@ -1,6 +1,6 @@
 {
   "name": "sqlfluff",
-  "version": "4.0.4",
+  "version": "4.1.0",
   "patterns": [
     {
       "patternId": "JJ01_jinja.padding",
@@ -328,6 +328,13 @@
       "patternId": "AM08_ambiguous.join_condition",
       "level": "Error",
       "category": "ErrorProne",
+      "parameters": [],
+      "enabled": false
+    },
+    {
+      "patternId": "AL10_aliasing.required",
+      "level": "Warning",
+      "category": "CodeStyle",
       "parameters": [],
       "enabled": false
     },
