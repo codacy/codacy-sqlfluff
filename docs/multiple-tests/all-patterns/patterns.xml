@@ -49,6 +49,7 @@
     <module name="AM06_ambiguous.column_references" />
     <module name="AM09_ambiguous.order_by_limit" />
     <module name="AM08_ambiguous.join_condition" />
+    <module name="AL10_aliasing.required" />
     <module name="AL04_aliasing.unique.table" />
     <module name="AL05_aliasing.unused" />
     <module name="AL01_aliasing.table" />

@@ -5,7 +5,7 @@ You can also create a docker to integrate the tool and language of your choice!
 See the [codacy-engine-scala-seed](https://github.com/codacy/codacy-engine-scala-seed) repository for more information.
 
 ## Python compatibility
-Compatible with Python 3.13
+Compatible with Python 3.14
 
 
 ## Dialects compatibility

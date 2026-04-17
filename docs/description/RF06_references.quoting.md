@@ -92,9 +92,11 @@ matter if the identifier is valid, a reserved keyword, or contains special
 characters.
 
 .. note::
-   Note due to different quotes being used by different dialects supported by
+   Due to different quotes being used by different dialects supported by
    `SQLFluff`, and those quotes meaning different things in different contexts,
-   this mode is not ``sqlfluff fix`` compatible.
+   this mode is generally not ``sqlfluff fix`` compatible.
+   SQLite is a narrow exception for ``prefer_quoted_keywords`` and supports
+   autofix using ``prefer_quoted_keyword_style``.
 
 **Anti-pattern**
 
