@@ -1,2 +1,2 @@
-sqlfluff==4.1.0
+sqlfluff==4.2.2
 jsonpickle==4.1.1

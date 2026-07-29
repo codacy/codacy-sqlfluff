@@ -1,6 +1,6 @@
 {
   "name": "sqlfluff",
-  "version": "4.1.0",
+  "version": "4.2.2",
   "patterns": [
     {
       "patternId": "JJ01_jinja.padding",
@@ -25,6 +25,13 @@
     },
     {
       "patternId": "RF03_references.consistent",
+      "level": "Error",
+      "category": "ErrorProne",
+      "parameters": [],
+      "enabled": false
+    },
+    {
+      "patternId": "RF07_references.window_alias",
       "level": "Error",
       "category": "ErrorProne",
       "parameters": [],
@@ -165,6 +172,13 @@
     },
     {
       "patternId": "TQ01_tsql.sp_prefix",
+      "level": "Warning",
+      "category": "CodeStyle",
+      "parameters": [],
+      "enabled": false
+    },
+    {
+      "patternId": "TQ04_tsql.prefer_as_alias",
       "level": "Warning",
       "category": "CodeStyle",
       "parameters": [],
@@ -328,6 +342,20 @@
       "patternId": "AM08_ambiguous.join_condition",
       "level": "Error",
       "category": "ErrorProne",
+      "parameters": [],
+      "enabled": false
+    },
+    {
+      "patternId": "PG02_postgres.not_valid_foreign_key",
+      "level": "Info",
+      "category": "CodeStyle",
+      "parameters": [],
+      "enabled": false
+    },
+    {
+      "patternId": "PG01_postgres.excessive_locks",
+      "level": "Info",
+      "category": "CodeStyle",
       "parameters": [],
       "enabled": false
     },

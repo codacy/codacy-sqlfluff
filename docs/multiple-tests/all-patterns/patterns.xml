@@ -6,6 +6,7 @@
     <module name="RF06_references.quoting" />
     <module name="RF02_references.qualification" />
     <module name="RF03_references.consistent" />
+    <module name="RF07_references.window_alias" />
     <module name="RF04_references.keywords" />
     <module name="RF05_references.special_chars" />
     <module name="RF01_references.from" />
@@ -26,6 +27,7 @@
     <module name="LT11_layout.set_operators" />
     <module name="OR01_oracle.empty_batch" />
     <module name="TQ01_tsql.sp_prefix" />
+    <module name="TQ04_tsql.prefer_as_alias" />
     <module name="TQ03_tsql.empty_batch" />
     <module name="TQ02_tsql.procedure_begin_end" />
     <module name="CV09_convention.blocked_words" />
@@ -49,6 +51,8 @@
     <module name="AM06_ambiguous.column_references" />
     <module name="AM09_ambiguous.order_by_limit" />
     <module name="AM08_ambiguous.join_condition" />
+    <module name="PG02_postgres.not_valid_foreign_key" />
+    <module name="PG01_postgres.excessive_locks" />
     <module name="AL10_aliasing.required" />
     <module name="AL04_aliasing.unique.table" />
     <module name="AL05_aliasing.unused" />
