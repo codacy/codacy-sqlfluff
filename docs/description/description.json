@@ -23,7 +23,14 @@
   {
     "patternId": "RF03_references.consistent",
     "title": "Column references should be qualified",
-    "description": "Column references should be qualified consistently in single table statements.\n\n.. note::\n    For BigQuery, Hive and Redshift this rule is disabled by default.\n    This is due to historical false positives associated with STRUCT data types.\n    This default behaviour may be changed in the future.\n    The rule can be enabled with the ``force_enable = True`` flag.\n\n\"consistent\" will be fixed to \"qualified\" if inconsistency is found.\n\n**Anti-pattern**\n\nIn this example, only the reference to ``b`` is qualified.\n\n.. code-block:: sql\n\n    SELECT\n        a,\n        foo.b\n    FROM foo\n\n**Best practice**\n\nEither all column references should be qualified, or all unqualified.\n\n.. code-block:: sql\n\n    SELECT\n        a,\n        b\n    FROM foo\n\n    -- Also good\n\n    SELECT\n        foo.a,\n        foo.b\n    FROM foo",
+    "description": "Column references should be qualified consistently in single table statements.\n\n.. note::\n    For Athena, BigQuery, Hive and Redshift this rule is disabled by default.\n    This is due to historical false positives associated with STRUCT data types.\n    This default behaviour may be changed in the future.\n    The rule can be enabled with the ``force_enable = True`` flag.\n\n\"consistent\" will be fixed to \"qualified\" if inconsistency is found.\n\n**Anti-pattern**\n\nIn this example, only the reference to ``b`` is qualified.\n\n.. code-block:: sql\n\n    SELECT\n        a,\n        foo.b\n    FROM foo\n\n**Best practice**\n\nEither all column references should be qualified, or all unqualified.\n\n.. code-block:: sql\n\n    SELECT\n        a,\n        b\n    FROM foo\n\n    -- Also good\n\n    SELECT\n        foo.a,\n        foo.b\n    FROM foo",
+    "timeToFix": 5,
+    "parameters": []
+  },
+  {
+    "patternId": "RF07_references.window_alias",
+    "title": "Do not reference a column",
+    "description": "Do not reference a column alias inside its own ``OVER`` clause.\n\nWindow functions are evaluated before the ``SELECT`` list aliases are\napplied, so an unqualified reference in a ``PARTITION BY`` or ``ORDER BY``\nwhich happens to match an alias does not resolve to that alias. When more\nthan one table is in scope it silently resolves to a real column on one of\nthem instead, changing the result without any error.\n\n.. note::\n   This rule is disabled by default. Enable it with the\n   ``force_enable = True`` flag.\n\n**Anti-pattern**\n\n``id`` is an alias for ``t1.col1``, but inside the window it resolves to\n``t2.id`` from the joined table.\n\n.. code-block:: sql\n\n    SELECT\n        t1.col1 AS id,\n        ROW_NUMBER() OVER (PARTITION BY id ORDER BY t1.ts) AS rn\n    FROM t1\n    LEFT JOIN t2 ON t1.col1 = t2.id\n\n**Best practice**\n\nQualify the reference with its table so the intended column is used.\n\n.. code-block:: sql\n\n    SELECT\n        t1.col1 AS id,\n        ROW_NUMBER() OVER (PARTITION BY t1.col1 ORDER BY t1.ts) AS rn\n    FROM t1\n    LEFT JOIN t2 ON t1.col1 = t2.id",
     "timeToFix": 5,
     "parameters": []
   },
@@ -164,6 +171,13 @@
     "patternId": "TQ01_tsql.sp_prefix",
     "title": "``sp `` prefix should not be",
     "description": "``SP_`` prefix should not be used for user-defined stored procedures in T-SQL.\n\n**Anti-pattern**\n\nThe ``SP_`` prefix is used to identify system procedures and can adversely\naffect performance of the user-defined stored procedure. It can also break\nsystem procedures if there is a naming conflict.\n\n.. code-block:: sql\n   :force:\n\n    CREATE PROCEDURE dbo.sp_pull_data\n    AS\n    SELECT\n        ID,\n        DataDate,\n        CaseOutput\n    FROM table1\n\n**Best practice**\n\nUse a different name for the stored procedure.\n\n.. code-block:: sql\n   :force:\n\n    CREATE PROCEDURE dbo.pull_data\n    AS\n    SELECT\n        ID,\n        DataDate,\n        CaseOutput\n    FROM table1\n\n    -- Alternatively prefix with USP_ to\n    -- indicate a user-defined stored procedure.\n\n    CREATE PROCEDURE dbo.usp_pull_data\n    AS\n    SELECT\n        ID,\n        DataDate,\n        CaseOutput\n    FROM table1",
+    "timeToFix": 5,
+    "parameters": []
+  },
+  {
+    "patternId": "TQ04_tsql.prefer_as_alias",
+    "title": "Prefer ansi-style ``as`` aliasing over",
+    "description": "Prefer ANSI-style ``AS`` aliasing over ``alias = expression`` in T-SQL.\n\nT-SQL supports an alternative alias form in ``SELECT`` clauses using\n``alias = expression``. This rule enforces the more ANSI-style\n``expression AS alias`` form instead.\n\nThis rule only applies to the ``tsql`` dialect and is disabled by\ndefault. Enable it with the ``force_enable = True`` flag.\n\n**Anti-pattern**\n\n.. code-block:: sql\n   :force:\n\n    SELECT\n        help3 = 'hello',\n        help4 = CASE WHEN help = 'apple' THEN 'hello' END\n\n**Best practice**\n\n.. code-block:: sql\n   :force:\n\n    SELECT\n        'hello' AS help3,\n        CASE WHEN help = 'apple' THEN 'hello' END AS help4",
     "timeToFix": 5,
     "parameters": []
   },
@@ -325,6 +339,20 @@
     "patternId": "AM08_ambiguous.join_condition",
     "title": "Implicit cross join detected",
     "description": "Implicit cross join detected.\n\n**Anti-pattern**\n\nCross joins are valid, but rare in the wild - and more often created by mistake\nthan on purpose. This rule catches situations where a cross join has been specified,\nbut not explicitly and so the risk of a mistaken cross join is highly likely.\n\n.. code-block:: sql\n   :force:\n\n    SELECT\n        foo\n    FROM bar\n    JOIN baz;\n\n**Best practice**\n\nUse CROSS JOIN.\n\n.. code-block:: sql\n   :force:\n\n    SELECT\n        foo\n    FROM bar\n    CROSS JOIN baz;",
+    "timeToFix": 5,
+    "parameters": []
+  },
+  {
+    "patternId": "PG02_postgres.not_valid_foreign_key",
+    "title": "Create postgresql foreign keys as",
+    "description": "Create PostgreSQL foreign keys as ``NOT VALID`` before validating.\n\nAdding a foreign key constraint normally validates existing rows as part of\nthe ``ALTER TABLE`` statement. On large tables, this can hold locks for\nlonger than necessary. Creating the constraint as ``NOT VALID`` defers that\nscan so it can be run later with ``VALIDATE CONSTRAINT``.\n\nThis rule only applies to the ``postgres`` dialect and is disabled by\ndefault. Enable it with the ``force_enable = True`` flag.\n\n**Anti-pattern**\n\nA foreign key constraint that validates existing rows during creation.\n\n.. code-block:: sql\n\n    ALTER TABLE foo ADD CONSTRAINT fk_bar\n        FOREIGN KEY (bar_id) REFERENCES bar (id);\n\n**Best practice**\n\nCreate the foreign key as ``NOT VALID``, then validate it in a separate\nstatement.\n\n.. code-block:: sql\n\n    ALTER TABLE foo ADD CONSTRAINT fk_bar\n        FOREIGN KEY (bar_id) REFERENCES bar (id) NOT VALID;\n\n    ALTER TABLE foo VALIDATE CONSTRAINT fk_bar;",
+    "timeToFix": 5,
+    "parameters": []
+  },
+  {
+    "patternId": "PG01_postgres.excessive_locks",
+    "title": "Avoid excessive locks in postgresql",
+    "description": "Avoid excessive locks in PostgreSQL DDL statements.\n\nSeveral PostgreSQL DDL operations acquire locks that block reads or writes\nfor the duration of the operation. On large tables this can cause significant\ndowntime. This rule flags statements that should use safer alternatives:\n\n* ``CREATE INDEX`` \u2192 use ``CONCURRENTLY`` (``CREATE UNIQUE INDEX`` excluded)\n* ``DROP INDEX`` \u2192 use ``CONCURRENTLY``\n* ``REINDEX`` \u2192 use ``CONCURRENTLY``\n* ``REFRESH MATERIALIZED VIEW`` \u2192 use ``CONCURRENTLY``\n\nThis rule only applies to the ``postgres`` dialect and is disabled by\ndefault. Enable it with the ``force_enable = True`` flag.\n\n**Anti-pattern**\n\nDDL that acquires excessive locks.\n\n.. code-block:: sql\n\n    CREATE INDEX idx_foo ON bar (tenant_id);\n\n    DROP INDEX idx_foo;\n\n    REINDEX INDEX idx_foo;\n\n    REFRESH MATERIALIZED VIEW my_view;\n\n**Best practice**\n\nUse non-blocking alternatives.\n\n.. code-block:: sql\n\n    CREATE INDEX CONCURRENTLY idx_foo ON bar (tenant_id);\n\n    DROP INDEX CONCURRENTLY idx_foo;\n\n    REINDEX INDEX CONCURRENTLY idx_foo;\n\n    REFRESH MATERIALIZED VIEW CONCURRENTLY my_view;",
     "timeToFix": 5,
     "parameters": []
   },

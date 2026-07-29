@@ -3,7 +3,7 @@
 Column references should be qualified consistently in single table statements.
 
 .. note::
-    For BigQuery, Hive and Redshift this rule is disabled by default.
+    For Athena, BigQuery, Hive and Redshift this rule is disabled by default.
     This is due to historical false positives associated with STRUCT data types.
     This default behaviour may be changed in the future.
     The rule can be enabled with the ``force_enable = True`` flag.
