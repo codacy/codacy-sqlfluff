@@ -1,6 +1,6 @@
 {
   "name": "sqlfluff",
-  "version": "4.2.2",
+  "version": "4.3.0",
   "patterns": [
     {
       "patternId": "JJ01_jinja.padding",
@@ -214,6 +214,13 @@
     },
     {
       "patternId": "CV07_convention.statement_brackets",
+      "level": "Info",
+      "category": "BestPractice",
+      "parameters": [],
+      "enabled": false
+    },
+    {
+      "patternId": "CV13_convention.last_select_star",
       "level": "Info",
       "category": "BestPractice",
       "parameters": [],

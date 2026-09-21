@@ -10,6 +10,14 @@ Enforce consistent type casting style.
     type casting apart from CONVERT and ::
     e.g DATE '2007-01-01', '9999-12-31' (DATE).
 
+.. note::
+    MySQL and the dialects that inherit it (MariaDB, Doris, StarRocks) take
+    ``CONVERT(expr, type)``, the opposite way round from the
+    ``CONVERT(type, expr)`` in T-SQL. The rule handles this dialect-specific
+    order appropriately when converting between styles.
+    ``CONVERT(expr USING transcoding_name)`` is character set transcoding,
+    not a type cast, and is left untouched.
+
 **Anti-pattern**
 
 Using mixture of CONVERT, :: and CAST when ``preferred_type_casting_style``
