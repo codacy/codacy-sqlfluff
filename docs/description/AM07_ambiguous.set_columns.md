@@ -25,7 +25,7 @@ When writing set expressions, all queries must return the same number of columns
 **Best practice**
 
 Always specify columns when writing set queries
-and ensure that they all seleect same number of columns
+and ensure that they all select same number of columns
 
 .. code-block:: sql
 

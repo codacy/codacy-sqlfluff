@@ -33,6 +33,7 @@
     <module name="CV09_convention.blocked_words" />
     <module name="CV08_convention.left_join" />
     <module name="CV07_convention.statement_brackets" />
+    <module name="CV13_convention.last_select_star" />
     <module name="CV03_convention.select_trailing_comma" />
     <module name="CV12_convention.join_condition" />
     <module name="CV02_convention.coalesce" />
