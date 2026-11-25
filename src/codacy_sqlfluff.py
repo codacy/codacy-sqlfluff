@@ -72,10 +72,15 @@ def readJsonFile(path):
         res = json.loads(file.read())
     return res
 
+# Fixed worker count passed as --processes, overriding `processes` in the
+# repo's .sqlfluff (`-1` there spawns one worker per node core and OOM-kills
+# the 2Gi container). Each worker needs a few hundred MB.
+SQLFLUFF_PROCESSES = 2
+
 def run_sqlfluff(options, files, cwd=None):
- 
+
     process = Popen(
-        ["sqlfluff", "lint", "--format", "json"] + options + files,
+        ["sqlfluff", "lint", "--format", "json", "--processes", str(SQLFLUFF_PROCESSES)] + options + files,
         stdout=PIPE,
         cwd=cwd
     )
